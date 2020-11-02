@@ -1,0 +1,44 @@
+@startuml
+skinparam handwritten true
+header PWA/APK Session handling
+actor Alice
+participant "User" as Alice
+participant "PWA" as Client
+participant "Authorization Server" as IAM
+autonumber
+
+Alice -> Client: Sign in
+
+Client -> IAM: Authenticate
+IAM -> Client: Refresh & access token
+
+Client -> Client: Start session timer
+note left
+Start counting down hours.
+Session Status: RUNNING
+end note
+...Refresh session every Y minutes...
+Client -> IAM: refresh token
+IAM -> Client: Refresh/access token
+...
+
+Alice -> Client: Put app into background
+Client -> Client: Stop session timer
+note left
+Session Status: PAUSED
+end note
+hnote over Client : Idle
+...
+Alice -> Client: Put app into foreground
+Client -> Client: Resume remaining session
+note left
+Session Status: RUNNING
+end note
+...Refresh session every Y minutes...
+Client -> IAM: refresh token
+IAM -> Client: Refresh/access token
+...
+...Session has ended...
+Client -> Alice: Logout and redirect to login
+
+@enduml
